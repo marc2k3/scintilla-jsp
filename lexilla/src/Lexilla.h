@@ -6,8 +6,4 @@
 // Copyright 2019 by Neil Hodgson <neilh@scintilla.org>
 // The License.txt file describes the conditions under which this software may be distributed.
 
-extern "C" {
-
-Scintilla::ILexer5 *CreateLexer(const char *name);
-
-}
+extern "C" Scintilla::ILexer5 * __stdcall CreateLexer(const char* name);
