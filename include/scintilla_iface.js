@@ -11,7 +11,7 @@ const filenames = {
 }
 
 const options = 'utf8'
-const newline = '\r\n'
+const CRLF = '\r\n'
 
 const types = {
 	'bool': 'bool',
@@ -48,7 +48,7 @@ public:
 	void SetFnPtr()
 	{
 		ATLASSERT(::IsWindow(this->m_hWnd));
-		fn = reinterpret_cast<FunctionDirect>(::SendMessage(this->m_hWnd, SCI_GETDIRECTFUNCTION, 0, 0));
+		fn = reinterpret_cast<SciFnDirect>(::SendMessage(this->m_hWnd, SCI_GETDIRECTFUNCTION, 0, 0));
 		ptr = ::SendMessage(this->m_hWnd, SCI_GETDIRECTPOINTER, 0, 0);
 	}
 
@@ -57,14 +57,12 @@ public:
 const footer =
 `
 private:
-	using FunctionDirect = intptr_t(*)(intptr_t ptr, uint32_t msg, uintptr_t wParam, intptr_t lParam);
-
 	intptr_t Call(uint32_t msg, uintptr_t wParam = 0, intptr_t lParam = 0)
 	{
 		return fn(ptr, msg, wParam, lParam);
 	}
 
-	FunctionDirect fn;
+	SciFnDirect fn;
 	intptr_t ptr;
 };
 `.split('\n')
@@ -78,9 +76,9 @@ function format_wp(type, name) {
 function format_lp(type, name) {
 	if (!name.length) return '0'
 	if (type.endsWith('*')) return `reinterpret_cast<intptr_t>(${name})`
-	if (type == 'int' || type == 'bool' || type == 'Colour' || type == 'Line' || type == 'Position') return name
-	console.log(`Parsing aborted because of unknown type: ${type} ${name}`)
-	process.exit(1)
+	const allowed = ['int', 'bool', 'Colour', 'Line', 'Position']
+	if (allowed.includes(type)) return name
+	exit(`Parsing aborted because of unknown type: ${type} ${name}`)
 }
 
 function get_args(line) {
@@ -95,19 +93,19 @@ function get_type(type) {
 }
 
 function create_body(content) {
-	const lines = content.split(newline)
+	const lines = content.split(CRLF)
 	const features = ['fun', 'get', 'set']
 	let tmp = []
 
 	for (const line of lines) {
 		if (line.startsWith('cat Deprecated')) break
 
-		const str = line.substr(0, line.indexOf('=')).split(' ')
-		const feature = str[0]
+		const arr = line.substr(0, line.indexOf('=')).split(' ')
+		const feature = arr[0]
 
 		if (features.includes(feature)) {
-			const ret = get_type(str[1])
-			const name = str[2]
+			const ret = get_type(arr[1])
+			const name = arr[2]
 
 			const [wp, lp] = get_args(line)
 			const typeWp = get_type(wp[0])
@@ -148,22 +146,21 @@ function create_body(content) {
 	return tmp
 }
 
+function exit(message) {
+	console.log(message)
+	process.exit(1)
+}
+
 const fs = require('fs')
 const path = require('path')
 
 fs.readFile(path.join(__dirname, filenames.input), options, (err, content) => {
-	if (err) {
-		console.log(err)
-		process.exit(1)
-	}
+	if (err) exit(err)
 
-	const out = [...header, ...create_body(content), ...footer].join(newline);
+	const out = [...header, ...create_body(content), ...footer].join(CRLF);
 
 	fs.writeFile(path.join(__dirname, filenames.output), out, options, (err) => {
-		if (err) {
-			console.log(err)
-			process.exit(1)
-		}
+		if (err) exit(err)
 		console.log('Done!')
 	})
 })
