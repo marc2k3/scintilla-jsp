@@ -5,9 +5,12 @@ Usage: node scintilla_iface.js
 
 'use strict'
 
+const fs = require('fs')
+const path = require('path')
+
 const filenames = {
-	'input': 'Scintilla.iface',
-	'output': '../../src/ui/ScintillaImpl.h',
+	'input': path.join(__dirname, 'Scintilla.iface'),
+	'output': path.join(__dirname, 'ScintillaImpl.h'),
 }
 
 const options = 'utf8'
@@ -39,7 +42,7 @@ template <class T>
 class CScintillaImpl : public CWindowImpl<T, CWindow, CControlWinTraits>
 {
 public:
-	DECLARE_WND_SUPERCLASS2(L"WTL_ScintillaCtrl", CScintillaImpl, CWindow::GetWndClassName())
+	DECLARE_WND_SUPERCLASS2(L"CScintillaImpl", CScintillaImpl, CWindow::GetWndClassName())
 
 	using Colour = int;
 	using Line = int;
@@ -151,15 +154,12 @@ function exit(message) {
 	process.exit(1)
 }
 
-const fs = require('fs')
-const path = require('path')
-
-fs.readFile(path.join(__dirname, filenames.input), options, (err, content) => {
+fs.readFile(filenames.input, options, (err, content) => {
 	if (err) exit(err)
 
 	const out = [...header, ...create_body(content), ...footer].join(CRLF);
 
-	fs.writeFile(path.join(__dirname, filenames.output), out, options, (err) => {
+	fs.writeFile(filenames.output, out, options, (err) => {
 		if (err) exit(err)
 		console.log('Done!')
 	})
