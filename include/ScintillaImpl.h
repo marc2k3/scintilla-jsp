@@ -21,7 +21,6 @@ public:
 		ptr = ::SendMessage(this->m_hWnd, SCI_GETDIRECTPOINTER, 0, 0);
 	}
 
-	// Auto-generated from Scintilla.iface by scintilla_iface.js
 	Colour GetAdditionalCaretFore() { return Call(SCI_GETADDITIONALCARETFORE); }
 	Colour GetCaretFore() { return Call(SCI_GETCARETFORE); }
 	Colour GetCaretLineBack() { return Call(SCI_GETCARETLINEBACK); }

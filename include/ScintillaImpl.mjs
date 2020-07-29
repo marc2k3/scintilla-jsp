@@ -1,16 +1,21 @@
 /*
 Copyright (C) 2020 marc2003
-Usage: node scintilla_iface.js
+Generates ScintillaImpl.h from Scintilla.iface
+
+Usage: node ScintillaImpl.mjs
 */
 
 'use strict'
 
-const fs = require('fs')
-const path = require('path')
+import { join, dirname } from 'path'
+import { readFile, writeFile } from 'fs'
+import { fileURLToPath } from 'url'
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = dirname(__filename)
 
 const filenames = {
-	'input': path.join(__dirname, 'Scintilla.iface'),
-	'output': path.join(__dirname, 'ScintillaImpl.h'),
+	'input': join(__dirname, 'Scintilla.iface'),
+	'output': join(__dirname, 'ScintillaImpl.h'),
 }
 
 const options = 'utf8'
@@ -54,9 +59,8 @@ public:
 		fn = reinterpret_cast<SciFnDirect>(::SendMessage(this->m_hWnd, SCI_GETDIRECTFUNCTION, 0, 0));
 		ptr = ::SendMessage(this->m_hWnd, SCI_GETDIRECTPOINTER, 0, 0);
 	}
+`.split('\n')
 
-	// Auto-generated from Scintilla.iface by scintilla_iface.js`.split('\n')
-	
 const footer =
 `
 private:
@@ -154,12 +158,12 @@ function exit(message) {
 	process.exit(1)
 }
 
-fs.readFile(filenames.input, options, (err, content) => {
+readFile(filenames.input, options, (err, content) => {
 	if (err) exit(err)
 
-	const out = [...header, ...create_body(content), ...footer].join(CRLF);
+	const out = [...header, ...create_body(content), ...footer].join(CRLF)
 
-	fs.writeFile(filenames.output, out, options, (err) => {
+	writeFile(filenames.output, out, options, (err) => {
 		if (err) exit(err)
 		console.log('Done!')
 	})
