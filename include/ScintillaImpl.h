@@ -4,6 +4,8 @@
 #include <Scintilla.h>
 #include <SciLexer.h>
 
+#pragma comment(lib, "Imm32.lib")
+
 template <class T>
 class CScintillaImpl : public CWindowImpl<T, CWindow, CControlWinTraits>
 {
