@@ -74,6 +74,7 @@ public:
 	Position GetLineIndentPosition(Line line) { return Call(SCI_GETLINEINDENTPOSITION, line); }
 	Position GetLineSelEndPosition(Line line) { return Call(SCI_GETLINESELENDPOSITION, line); }
 	Position GetLineSelStartPosition(Line line) { return Call(SCI_GETLINESELSTARTPOSITION, line); }
+	Position GetMultiEdgeColumn(int which) { return Call(SCI_GETMULTIEDGECOLUMN, which); }
 	Position GetRectangularSelectionAnchor() { return Call(SCI_GETRECTANGULARSELECTIONANCHOR); }
 	Position GetRectangularSelectionAnchorVirtualSpace() { return Call(SCI_GETRECTANGULARSELECTIONANCHORVIRTUALSPACE); }
 	Position GetRectangularSelectionCaret() { return Call(SCI_GETRECTANGULARSELECTIONCARET); }
