@@ -126,7 +126,6 @@
     <ClInclude Include="..\include\ILoader.h" />
     <ClInclude Include="..\include\Platform.h" />
     <ClInclude Include="..\include\Scintilla.h" />
-    <ClInclude Include="..\include\ScintillaImpl.h" />
     <ClInclude Include="..\include\ScintillaWidget.h" />
     <ClInclude Include="..\include\Sci_Position.h" />
     <ClInclude Include="..\src\AutoComplete.h" />
