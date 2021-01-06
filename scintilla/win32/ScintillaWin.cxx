@@ -150,7 +150,7 @@ using namespace Scintilla;
 
 namespace {
 
-const TCHAR callClassName[] = TEXT("calltip.jsp");
+const TCHAR callClassName[] = TEXT("Calltip.jsp");
 
 void SetWindowID(HWND hWnd, int identifier) noexcept {
 	::SetWindowLongPtr(hWnd, GWLP_ID, identifier);
@@ -3337,7 +3337,7 @@ bool ScintillaWin::Register(HINSTANCE hInstance_) noexcept {
 	wndclass.lpfnWndProc = ScintillaWin::SWndProc;
 	wndclass.cbWndExtra = sizeof(ScintillaWin *);
 	wndclass.hInstance = hInstance;
-	wndclass.lpszClassName = L"scintilla.jsp";
+	wndclass.lpszClassName = L"Scintilla.jsp";
 	scintillaClassAtom = ::RegisterClassExW(&wndclass);
 	const bool result = 0 != scintillaClassAtom;
 

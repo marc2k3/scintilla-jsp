@@ -2530,7 +2530,7 @@ public:
 	}
 };
 
-const TCHAR ListBoxX_ClassName[] = TEXT("ListBoxX");
+const TCHAR ListBoxX_ClassName[] = TEXT("ListBoxX.jsp");
 
 ListBox::ListBox() noexcept {
 }
