@@ -122,7 +122,6 @@
     <ClInclude Include="..\lexlib\StyleContext.h" />
     <ClInclude Include="..\lexlib\SubStyles.h" />
     <ClInclude Include="..\lexlib\WordList.h" />
-    <ClInclude Include="Lexilla.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

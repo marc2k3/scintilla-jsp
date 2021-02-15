@@ -535,11 +535,8 @@ void ScintillaBase::RightButtonDownWithModifiers(Point pt, unsigned int curTime,
 namespace Scintilla {
 
 class LexState : public LexInterface {
-	int interfaceVersion;
 public:
-	int lexLanguage;
-
-	explicit LexState(Document *pdoc_);
+	explicit LexState(Document *pdoc_) noexcept;
 	void SetInstance(ILexer5 *instance_);
 	// Deleted so LexState objects can not be copied.
 	LexState(const LexState &) = delete;
@@ -579,10 +576,7 @@ public:
 
 }
 
-LexState::LexState(Document *pdoc_) : LexInterface(pdoc_) {
-	performingStyle = false;
-	interfaceVersion = lvRelease4;
-	lexLanguage = 0;
+LexState::LexState(Document *pdoc_) noexcept : LexInterface(pdoc_) {
 }
 
 LexState::~LexState() {
@@ -627,24 +621,20 @@ void LexState::SetWordList(int n, const char *wl) {
 
 int LexState::GetIdentifier() const {
 	if (instance) {
-		if (instance->Version() >= lvRelease5) {
-			return instance->GetIdentifier();
-		}
+		return instance->GetIdentifier();
 	}
 	return 0;
 }
 
 const char *LexState::GetName() const {
 	if (instance) {
-		if (instance->Version() >= lvRelease5) {
-			return instance->GetName();
-		}
+		return instance->GetName();
 	}
 	return "";
 }
 
 void *LexState::PrivateCall(int operation, void *pointer) {
-	if (pdoc && instance) {
+	if (instance) {
 		return instance->PrivateCall(operation, pointer);
 	} else {
 		return nullptr;
@@ -817,7 +807,7 @@ const char *LexState::DescriptionOfStyle(int style) {
 }
 
 void ScintillaBase::NotifyStyleToNeeded(Sci::Position endStyleNeeded) {
-	if (DocumentLexState()->GetIdentifier() != 0) {
+	if (!DocumentLexState()->UseContainerLexing()) {
 		const Sci::Line lineEndStyled =
 			pdoc->SciLineFromPosition(pdoc->GetEndStyled());
 		const Sci::Position endStyled =
@@ -1031,11 +1021,11 @@ sptr_t ScintillaBase::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lPara
 		return DocumentLexState()->GetIdentifier();
 
 	case SCI_SETILEXER:
-		DocumentLexState()->SetInstance(reinterpret_cast<ILexer5 *>(lParam));
+		DocumentLexState()->SetInstance(static_cast<ILexer5 *>(PtrFromSPtr(lParam)));
 		return 0;
 
 	case SCI_COLOURISE:
-		if (DocumentLexState()->lexLanguage == 0) {
+		if (DocumentLexState()->UseContainerLexing()) {
 			pdoc->ModifiedAt(static_cast<Sci::Position>(wParam));
 			NotifyStyleToNeeded((lParam == -1) ? pdoc->Length() : lParam);
 		} else {
@@ -1068,7 +1058,7 @@ sptr_t ScintillaBase::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lPara
 
 	case SCI_PRIVATELEXERCALL:
 		return reinterpret_cast<sptr_t>(
-			DocumentLexState()->PrivateCall(static_cast<int>(wParam), reinterpret_cast<void *>(lParam)));
+			DocumentLexState()->PrivateCall(static_cast<int>(wParam), PtrFromSPtr(lParam)));
 
 #ifdef INCLUDE_DEPRECATED_FEATURES
 	case SCI_GETSTYLEBITSNEEDED:
